@@ -1,0 +1,36 @@
+name: Deploy Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    name: Configure OCI CLI
+    env:
+      OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+      OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+    
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install modules
+        run: pnpm install
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Deploy to OCI Object Storage
+        run: oci os object sync --bucket-name ${{ secrets.OCI_OS_BUCKET }} --src-dir ./dist/ --delete
+
+
