@@ -31,6 +31,6 @@ jobs:
         run: pnpm build
 
       - name: Deploy to OCI Object Storage
-        run: oci os object sync --bucket-name ${{ secrets.OCI_OS_BUCKET }} --src-dir ./dist/ --delete
-
-
+        uses: oracle-actions/run-oci-cli-command@v1.3.2
+        with:
+          command: 'oci os object sync --bucket-name ${{ secrets.OCI_OS_BUCKET }} --src-dir ./dist/ --delete'
